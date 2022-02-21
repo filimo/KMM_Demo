@@ -17,28 +17,31 @@ extension Publisher {
     func bind<T: Equatable>(
         flowItem: Observable<AnyObject>,
         defaultValue: T,
+        canNil: Bool = true,
         in set: inout Set<AnyCancellable>
     ) -> AnyPublisher<T, Never> where Self.Output: Equatable, Self.Failure == Never {
         dropFirst()
-            .print("publishedItem: ")
             .removeDuplicates()
+            .print("Send value to Flow: ")
             .sink { flowItem.setValue(value: $0) }
             .store(in: &set)
 
         return createPublisher(for: flowItem.flowNative)
-            .print("valueFromFlow: ")
             .errorToLog()
             .map {
                 let val = $0 as? T
-                
+
                 guard let val = val else {
-                    Swift.print("Parsing error: \(String(describing: $0)) as? \(T.self) = \(String(describing: val))")
-                    
+                    if canNil == false {
+                        Swift.print("Parsing error: \(String(describing: $0)) as? \(T.self) = \(String(describing: val))")
+                    }
+
                     return defaultValue
                 }
-                
+
                 return val
             }
+            .print("Get value from Flow: ")
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()

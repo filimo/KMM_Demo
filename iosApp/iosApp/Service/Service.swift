@@ -25,7 +25,7 @@ class Service: ObservableObject {
             .assign(to: &$visibility)
 
         $valueNull
-            .bind(flowItem: controls[0].value, defaultValue: "nil", in: &subs)
+            .bind(flowItem: controls[0].value, defaultValue: "nil", canNil: true, in: &subs)
             .assign(to: &$valueNull)
 
         if let item2 = controls[0].children?[0] {
