@@ -1,29 +1,25 @@
-import Combine
-import shared
 import SwiftUI
 
 struct ContentView: View {
-    let greet = Greeting().greeting(vv: .east)
-    @State var repo: [Control] = []
-    let repository = Repository()
+    @ObservedObject var service = Service.shared
 
     var body: some View {
         VStack {
-            Text(greet)
-            ForEach(repo, id: \.self) { item in
-                if item.visibility {
-                    Text(item.label ?? "non")
-                }
-            }
-        }
-        .onAppear {
-            repository.getControlsList { repo, error in
-                if let error = error {
-                    print(error)
-                    return
-                }
+            Text(String(describing: service.visibility))
 
-                self.repo = repo!
+            Button("Set") {
+                service.visibility?.toggle()
+            }
+
+            HStack {
+                Text("value nul:")
+
+                TextField("", text: $service.valueNull)
+            }
+
+            HStack {
+                Text("value: ")
+                TextField("", text: $service.value)
             }
         }
     }
